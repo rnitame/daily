@@ -18,6 +18,7 @@ const (
 )
 
 func main() {
+	// ファイルを読み込んでトークン取得
 	file, err := os.Open(`./token.txt`)
 	if err != nil {
 		log.Fatal(err)
@@ -33,6 +34,7 @@ func main() {
 		log.Fatal(err)
 	}
 
+	// go-github と oauth2 で GitHub の認証
 	ts := oauth2.StaticTokenSource(
 		&oauth2.Token{AccessToken: token},
 	)
@@ -44,5 +46,6 @@ func main() {
 		log.Fatal(err)
 	}
 
+	// 自分のリポジトリ一覧表示
 	fmt.Print(repos)
 }
