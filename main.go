@@ -41,11 +41,11 @@ func main() {
 	tc := oauth2.NewClient(oauth2.NoContext, ts)
 
 	client := github.NewClient(tc)
-	repos, _, err := client.Repositories.List(oauth2.NoContext, "", nil)
+	events, _, err := client.Activity.ListEventsPerformedByUser(oauth2.NoContext, "rnitame", false, nil)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	// 自分のリポジトリ一覧表示
-	fmt.Print(repos)
+	// 自分が実行したイベント一覧表示
+	fmt.Print(events)
 }
