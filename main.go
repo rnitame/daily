@@ -1,9 +1,14 @@
 package main
 
 import (
-	"fmt"
+	"context"
 	"log"
 	"os"
+
+	"fmt"
+
+	"github.com/google/go-github/github"
+	"golang.org/x/oauth2"
 )
 
 // 読み込みバッファのサイズ
@@ -29,6 +34,16 @@ func main() {
 			break
 		}
 
-		fmt.Print(string(buf[:n]))
 	}
+
+	ctx := context.Background()
+	ts := oauth2.StaticTokenSource(
+		&oauth2.Token{AccessToken: ""},
+	)
+	tc := oauth2.NewClient(ctx, ts)
+
+	client := github.NewClient(tc)
+	repos, _, err := client.Repositories.List(ctx, "", nil)
+
+	fmt.Print(repos)
 }
