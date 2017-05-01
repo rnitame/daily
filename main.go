@@ -1,11 +1,12 @@
 package main
 
 import (
-	"context"
 	"log"
 	"os"
 
 	"fmt"
+
+	"bufio"
 
 	"github.com/google/go-github/github"
 	"golang.org/x/oauth2"
@@ -23,27 +24,25 @@ func main() {
 	}
 	defer file.Close()
 
-	buf := make([]byte, BUFSIZE)
-	for {
-		n, err := file.Read(buf)
-		if n == 0 {
-			break
-		}
-		if err != nil {
-			log.Fatal(err)
-			break
-		}
-
+	buf := bufio.NewScanner(file)
+	token := ""
+	for buf.Scan() {
+		token = buf.Text()
+	}
+	if err := buf.Err(); err != nil {
+		log.Fatal(err)
 	}
 
-	ctx := context.Background()
 	ts := oauth2.StaticTokenSource(
-		&oauth2.Token{AccessToken: ""},
+		&oauth2.Token{AccessToken: token},
 	)
-	tc := oauth2.NewClient(ctx, ts)
+	tc := oauth2.NewClient(oauth2.NoContext, ts)
 
 	client := github.NewClient(tc)
-	repos, _, err := client.Repositories.List(ctx, "", nil)
+	repos, _, err := client.Repositories.List(oauth2.NoContext, "", nil)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	fmt.Print(repos)
 }
