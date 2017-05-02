@@ -8,6 +8,8 @@ import (
 
 	"bufio"
 
+	"encoding/json"
+
 	"github.com/google/go-github/github"
 	"golang.org/x/oauth2"
 )
@@ -47,5 +49,7 @@ func main() {
 	}
 
 	// 自分が実行したイベント一覧表示
-	fmt.Print(events)
+	value, _ := json.Marshal(events)
+	// repo := gjson.Get(string(value), "Repo")
+	fmt.Print(value)
 }

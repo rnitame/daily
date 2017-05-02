@@ -6,3 +6,5 @@ import:
 - package: golang.org/x/oauth2
   subpackages:
   - '...'
+- package: github.com/tidwall/gjson
+- package: github.com/tidwall/match
