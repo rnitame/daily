@@ -10,6 +10,8 @@ import (
 
 	"time"
 
+	"strings"
+
 	"github.com/google/go-github/github"
 	"golang.org/x/oauth2"
 )
@@ -49,9 +51,14 @@ func main() {
 		log.Fatal(err)
 	}
 
-	// 自分が実行したイベント一覧表示
+	// コマンド叩いた日のイベントを表示する
 	jst, _ := time.LoadLocation("Asia/Tokyo")
+	today := time.Now()
+	const layout = "2006-01-02"
 	for _, value := range events {
-		fmt.Println(value.CreatedAt.In(jst))
+		// API から取ってきた CreatedAt の文字列に、コマンド叩いた日付が含まれていれば表示
+		if strings.Contains(value.CreatedAt.In(jst).String(), string(today.Format(layout))) {
+			fmt.Println(value.Repo.Name, value.Type, value.RawPayload)
+		}
 	}
 }
