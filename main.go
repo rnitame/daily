@@ -8,7 +8,7 @@ import (
 
 	"bufio"
 
-	"encoding/json"
+	"time"
 
 	"github.com/google/go-github/github"
 	"golang.org/x/oauth2"
@@ -43,13 +43,15 @@ func main() {
 	tc := oauth2.NewClient(oauth2.NoContext, ts)
 
 	client := github.NewClient(tc)
-	events, _, err := client.Activity.ListEventsPerformedByUser(oauth2.NoContext, "rnitame", false, nil)
+	options := github.ListOptions{Page: 1, PerPage: 50}
+	events, _, err := client.Activity.ListEventsPerformedByUser(oauth2.NoContext, "rnitame", false, &options)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	// 自分が実行したイベント一覧表示
-	value, _ := json.Marshal(events)
-	// repo := gjson.Get(string(value), "Repo")
-	fmt.Print(value)
+	jst, _ := time.LoadLocation("Asia/Tokyo")
+	for _, value := range events {
+		fmt.Println(value.CreatedAt.In(jst))
+	}
 }
