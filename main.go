@@ -13,6 +13,7 @@ import (
 	"strings"
 
 	"github.com/google/go-github/github"
+	"github.com/tidwall/gjson"
 	"golang.org/x/oauth2"
 )
 
@@ -58,7 +59,9 @@ func main() {
 	for _, value := range events {
 		// API から取ってきた CreatedAt の文字列に、コマンド叩いた日付が含まれていれば表示
 		if strings.Contains(value.CreatedAt.In(jst).String(), string(today.Format(layout))) {
-			fmt.Println(value.Repo.Name, value.Type, value.RawPayload)
+			json, _ := value.RawPayload.MarshalJSON()
+			payload := gjson.Get(string(json), "action")
+			fmt.Println(*value.Repo.Name, *value.Type, payload)
 		}
 	}
 }
