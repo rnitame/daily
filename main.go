@@ -47,7 +47,8 @@ func main() {
 
 	client := github.NewClient(tc)
 	options := github.ListOptions{Page: 1, PerPage: 50}
-	events, _, err := client.Activity.ListEventsPerformedByUser(oauth2.NoContext, "rnitame", false, &options)
+	user, _, err := client.Users.Get(oauth2.NoContext, "")
+	events, _, err := client.Activity.ListEventsPerformedByUser(oauth2.NoContext, user.GetLogin(), false, &options)
 	if err != nil {
 		log.Fatal(err)
 	}
