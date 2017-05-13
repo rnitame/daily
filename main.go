@@ -2,17 +2,15 @@ package main
 
 import (
 	"log"
-	"os"
 
 	"fmt"
-
-	"bufio"
 
 	"time"
 
 	"strings"
 
 	"github.com/google/go-github/github"
+	gitconfig "github.com/tcnksm/go-gitconfig"
 	"github.com/tidwall/gjson"
 	"golang.org/x/oauth2"
 )
@@ -23,19 +21,9 @@ const (
 )
 
 func main() {
-	// ファイルを読み込んでトークン取得
-	file, err := os.Open(`./token.txt`)
+	// グローバルな gitconfig にあるトークンを持ってくる
+	token, err := gitconfig.Global("github.token")
 	if err != nil {
-		log.Fatal(err)
-	}
-	defer file.Close()
-
-	buf := bufio.NewScanner(file)
-	token := ""
-	for buf.Scan() {
-		token = buf.Text()
-	}
-	if err := buf.Err(); err != nil {
 		log.Fatal(err)
 	}
 

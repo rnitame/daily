@@ -1,5 +1,5 @@
-hash: 331c29ea77bc53e2680a758e0d2fb31f2d6cf4eaf3234fb353f047fec03b994b
-updated: 2017-05-02T14:02:43.165579636+09:00
+hash: 856a3986a8f110b13ccbf0202af6e46d151efe3832c528976ea95c53d2b667cc
+updated: 2017-05-13T17:39:35.506266627+09:00
 imports:
 - name: github.com/golang/protobuf
   version: 18c9bb3261723cd5401db4d0c9fbc5c3b6c70fe8
@@ -13,6 +13,8 @@ imports:
   version: 53e6ce116135b80d037921a7fdd5138cf32d7a8a
   subpackages:
   - query
+- name: github.com/tcnksm/go-gitconfig
+  version: d154598bacbf4501c095a309753c5d4af66caa81
 - name: github.com/tidwall/gjson
   version: e30a9c1037e0f9fbde93a6a9848a2dd5c59d3b91
 - name: github.com/tidwall/match

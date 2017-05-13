@@ -8,3 +8,5 @@ import:
   - '...'
 - package: github.com/tidwall/gjson
 - package: github.com/tidwall/match
+- package: github.com/tcnksm/go-gitconfig
+  version: ^0.1.2
