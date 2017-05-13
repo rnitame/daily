@@ -1,10 +1,8 @@
 # github-daily-report
 
 
-## Set personal token
+## Set GitHub personal token
 
 ```
-$ cp token.txt.example token.txt
-// rewrite token
-$ vi token.txt
+$ git config --global "github.token" xxxxx
 ```
