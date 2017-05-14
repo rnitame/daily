@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"log"
 
 	"fmt"
@@ -20,7 +21,13 @@ const (
 	BUFSIZE = 1024
 )
 
+var (
+	org = flag.String("org", "", "organization name for showing events")
+)
+
 func main() {
+	flag.Parse()
+
 	// グローバルな gitconfig にあるトークンを持ってくる
 	token, err := gitconfig.Global("github.token")
 	if err != nil {
@@ -50,6 +57,11 @@ func main() {
 		if strings.Contains(value.CreatedAt.In(jst).String(), string(today.Format(layout))) {
 			json, _ := value.RawPayload.MarshalJSON()
 			payload := gjson.Get(string(json), "action")
+
+			// organization が指定されていたらその organization のイベントだけ出力
+			if *org != "" && !strings.Contains(*value.Repo.Name, *org) {
+				continue
+			}
 			fmt.Println(*value.Repo.Name, *value.Type, payload)
 		}
 	}
