@@ -1,4 +1,5 @@
-# github-daily-report
+# daily
+Get daily events from GitHub
 
 
 ## Set GitHub personal token
