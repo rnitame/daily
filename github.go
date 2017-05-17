@@ -2,11 +2,11 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"strings"
 	"time"
 
 	"github.com/google/go-github/github"
+	"github.com/pkg/errors"
 	gitconfig "github.com/tcnksm/go-gitconfig"
 	"github.com/tidwall/gjson"
 	"golang.org/x/oauth2"
@@ -16,7 +16,7 @@ func NewGitHubClient() *github.Client {
 	// グローバルな gitconfig にあるトークンを持ってくる
 	token, err := gitconfig.Global("github.token")
 	if err != nil {
-		log.Fatal(err)
+		errors.Wrap(err, "get github token failed")
 	}
 
 	// go-github と oauth2 で GitHub の認証
@@ -31,17 +31,20 @@ func NewGitHubClient() *github.Client {
 func GetEvents(client *github.Client, org *string) {
 	options := github.ListOptions{Page: 1, PerPage: 50}
 	user, _, err := client.Users.Get(oauth2.NoContext, "")
+	if err != nil {
+		errors.Wrap(err, "get users failed")
+	}
+
 	events, _, err := client.Activity.ListEventsPerformedByUser(oauth2.NoContext, user.GetLogin(), false, &options)
 	if err == nil {
 		SieveOutEvents(events, org)
 	} else {
-		log.Fatal(err)
+		errors.Wrap(err, "get events failed")
 	}
 }
 
 // イベントのふるい分け
 func SieveOutEvents(events []*github.Event, org *string) {
-	// コマンド叩いた日のイベントを表示する
 	jst, _ := time.LoadLocation("Asia/Tokyo")
 	today := time.Now()
 	const layout = "2006-01-02"
