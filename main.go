@@ -16,11 +16,6 @@ import (
 	"golang.org/x/oauth2"
 )
 
-// 読み込みバッファのサイズ
-const (
-	BUFSIZE = 1024
-)
-
 var (
 	org = flag.String("org", "", "organization name for showing events")
 )
