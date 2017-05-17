@@ -28,17 +28,19 @@ func NewGitHubClient() *github.Client {
 	return github.NewClient(tc)
 }
 
-func GetEvents(client *github.Client, org string) {
+func GetEvents(client *github.Client, org *string) {
 	options := github.ListOptions{Page: 1, PerPage: 50}
 	user, _, err := client.Users.Get(oauth2.NoContext, "")
 	events, _, err := client.Activity.ListEventsPerformedByUser(oauth2.NoContext, user.GetLogin(), false, &options)
-	if err != nil {
+	if err == nil {
+		SieveOutEvents(events, org)
+	} else {
 		log.Fatal(err)
 	}
 }
 
 // イベントのふるい分け
-func SieveOutEvents(events []*github.Event, org string) {
+func SieveOutEvents(events []*github.Event, org *string) {
 	// コマンド叩いた日のイベントを表示する
 	jst, _ := time.LoadLocation("Asia/Tokyo")
 	today := time.Now()
