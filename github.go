@@ -12,14 +12,13 @@ import (
 	"golang.org/x/oauth2"
 )
 
+// NewGitHubClient go-github のクライアント作成
 func NewGitHubClient() *github.Client {
-	// グローバルな gitconfig にあるトークンを持ってくる
 	token, err := gitconfig.Global("github.token")
 	if err != nil {
 		errors.Wrap(err, "get github token failed")
 	}
 
-	// go-github と oauth2 で GitHub の認証
 	ts := oauth2.StaticTokenSource(
 		&oauth2.Token{AccessToken: token},
 	)
@@ -28,6 +27,7 @@ func NewGitHubClient() *github.Client {
 	return github.NewClient(tc)
 }
 
+// GetEvents GitHub API から自分のイベントを取得
 func GetEvents(client *github.Client, org *string) {
 	options := github.ListOptions{Page: 1, PerPage: 50}
 	user, _, err := client.Users.Get(oauth2.NoContext, "")
@@ -43,7 +43,7 @@ func GetEvents(client *github.Client, org *string) {
 	}
 }
 
-// イベントのふるい分け
+// SieveOutEvents イベントのふるい分け
 func SieveOutEvents(events []*github.Event, org *string) {
 	jst, _ := time.LoadLocation("Asia/Tokyo")
 	today := time.Now()
