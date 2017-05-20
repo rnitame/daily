@@ -43,7 +43,7 @@ func GetEvents(client *github.Client, org *string) {
 	}
 }
 
-// SieveOutEvents イベントのふるい分け
+// SieveOutEvents flag によって出すイベントを絞る
 func SieveOutEvents(events []*github.Event, org *string) {
 	jst, _ := time.LoadLocation("Asia/Tokyo")
 	today := time.Now()
@@ -61,5 +61,9 @@ func SieveOutEvents(events []*github.Event, org *string) {
 			fmt.Println(*value.Repo.Name, *value.Type, payload)
 		}
 	}
+}
+
+// ExtractEvents GitHub のイベントの中から必要なものだけ抽出
+func ExtractEvents(json *string) {
 
 }
