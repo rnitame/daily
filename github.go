@@ -5,6 +5,8 @@ import (
 	"strings"
 	"time"
 
+	"log"
+
 	"github.com/google/go-github/github"
 	"github.com/pkg/errors"
 	gitconfig "github.com/tcnksm/go-gitconfig"
@@ -16,7 +18,7 @@ import (
 func NewGitHubClient() *github.Client {
 	token, err := gitconfig.Global("github.token")
 	if err != nil {
-		errors.Wrap(err, "get github token failed")
+		log.Fatalln(errors.Wrap(err, "get github token failed"))
 	}
 
 	ts := oauth2.StaticTokenSource(
@@ -32,14 +34,14 @@ func GetEvents(client *github.Client, org *string) {
 	options := github.ListOptions{Page: 1, PerPage: 50}
 	user, _, err := client.Users.Get(oauth2.NoContext, "")
 	if err != nil {
-		errors.Wrap(err, "get users failed")
+		log.Fatalln(errors.Wrap(err, "get users failed"))
 	}
 
 	events, _, err := client.Activity.ListEventsPerformedByUser(oauth2.NoContext, user.GetLogin(), false, &options)
 	if err == nil {
 		SieveOutEvents(events, org)
 	} else {
-		errors.Wrap(err, "get events failed")
+		log.Fatalln(errors.Wrap(err, "get events failed"))
 	}
 }
 
@@ -50,7 +52,7 @@ func SieveOutEvents(events []*github.Event, org *string) {
 	const layout = "2006-01-02"
 	for _, value := range events {
 		// API から取ってきた CreatedAt の文字列に、コマンド叩いた日付が含まれていれば表示
-		if strings.Contains(value.CreatedAt.In(jst).String(), string(today.Format(layout))) {
+		if strings.Contains(value.CreatedAt.In(jst).String(), "2017-06") {
 			json, _ := value.RawPayload.MarshalJSON()
 			payload := gjson.Get(string(json), "action")
 
@@ -64,6 +66,6 @@ func SieveOutEvents(events []*github.Event, org *string) {
 }
 
 // ExtractEvents GitHub のイベントの中から必要なものだけ抽出
-func ExtractEvents(json *string) {
-
+func ExtractEvents(json string) {
+	fmt.Println(json)
 }
