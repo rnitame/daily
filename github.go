@@ -48,24 +48,34 @@ func GetEvents(client *github.Client, org *string) {
 // SieveOutEvents flag によって出すイベントを絞る
 func SieveOutEvents(events []*github.Event, org *string) {
 	jst, _ := time.LoadLocation("Asia/Tokyo")
-	today := time.Now()
+	// today := time.Now()
 	const layout = "2006-01-02"
 	for _, value := range events {
 		// API から取ってきた CreatedAt の文字列に、コマンド叩いた日付が含まれていれば表示
 		if strings.Contains(value.CreatedAt.In(jst).String(), "2017-06") {
-			json, _ := value.RawPayload.MarshalJSON()
-			payload := gjson.Get(string(json), "action")
-
 			// organization が指定されていたらその organization のイベントだけ出力
 			if *org != "" && !strings.Contains(*value.Repo.Name, *org) {
 				continue
 			}
-			fmt.Println(*value.Repo.Name, *value.Type, payload)
+
+			payload, _ := value.ParsePayload()
+			switch *value.Type {
+			case "PullRequestEvent":
+				pr, ok := payload.(*github.PullRequestEvent)
+				if ok {
+					fmt.Println(*value.Repo.Name, *value.Type, *pr.PullRequest.Title)
+				}
+			case "IssuesEvent":
+				issue, ok := payload.(*github.IssuesEvent)
+				if !ok {
+					log.Fatalln("Failed type assertion")
+				}
+				fmt.Println(*value.Repo.Name, *value.Type, &issue.Issue.Title)
+			default:
+				json, _ := value.RawPayload.MarshalJSON()
+				action := gjson.Get(string(json), "action")
+				fmt.Println(*value.Repo.Name, *value.Type, action)
+			}
 		}
 	}
-}
-
-// ExtractEvents GitHub のイベントの中から必要なものだけ抽出
-func ExtractEvents(json string) {
-	fmt.Println(json)
 }
