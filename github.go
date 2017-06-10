@@ -5,6 +5,8 @@ import (
 	"strings"
 	"time"
 
+	"log"
+
 	"github.com/google/go-github/github"
 	"github.com/pkg/errors"
 	gitconfig "github.com/tcnksm/go-gitconfig"
@@ -16,7 +18,7 @@ import (
 func NewGitHubClient() *github.Client {
 	token, err := gitconfig.Global("github.token")
 	if err != nil {
-		errors.Wrap(err, "get github token failed")
+		log.Fatalln(errors.Wrap(err, "get github token failed"))
 	}
 
 	ts := oauth2.StaticTokenSource(
@@ -32,18 +34,18 @@ func GetEvents(client *github.Client, org *string) {
 	options := github.ListOptions{Page: 1, PerPage: 50}
 	user, _, err := client.Users.Get(oauth2.NoContext, "")
 	if err != nil {
-		errors.Wrap(err, "get users failed")
+		log.Fatalln(errors.Wrap(err, "get users failed"))
 	}
 
 	events, _, err := client.Activity.ListEventsPerformedByUser(oauth2.NoContext, user.GetLogin(), false, &options)
 	if err == nil {
 		SieveOutEvents(events, org)
 	} else {
-		errors.Wrap(err, "get events failed")
+		log.Fatalln(errors.Wrap(err, "get events failed"))
 	}
 }
 
-// SieveOutEvents イベントのふるい分け
+// SieveOutEvents flag によって出すイベントを絞る
 func SieveOutEvents(events []*github.Event, org *string) {
 	jst, _ := time.LoadLocation("Asia/Tokyo")
 	today := time.Now()
@@ -51,15 +53,31 @@ func SieveOutEvents(events []*github.Event, org *string) {
 	for _, value := range events {
 		// API から取ってきた CreatedAt の文字列に、コマンド叩いた日付が含まれていれば表示
 		if strings.Contains(value.CreatedAt.In(jst).String(), string(today.Format(layout))) {
-			json, _ := value.RawPayload.MarshalJSON()
-			payload := gjson.Get(string(json), "action")
-
 			// organization が指定されていたらその organization のイベントだけ出力
 			if *org != "" && !strings.Contains(*value.Repo.Name, *org) {
 				continue
 			}
-			fmt.Println(*value.Repo.Name, *value.Type, payload)
+
+			payload, _ := value.ParsePayload()
+			// 特定のイベントだけタイトルを表示
+			switch *value.Type {
+			case "PullRequestEvent":
+				pr, ok := payload.(*github.PullRequestEvent)
+				if !ok {
+					log.Fatalln("Failed type assertion")
+				}
+				fmt.Println(*value.Repo.Name, *value.Type, *pr.PullRequest.Title)
+			case "IssuesEvent":
+				issue, ok := payload.(*github.IssuesEvent)
+				if !ok {
+					log.Fatalln("Failed type assertion")
+				}
+				fmt.Println(*value.Repo.Name, *value.Type, *issue.Issue.Title)
+			default:
+				json, _ := value.RawPayload.MarshalJSON()
+				action := gjson.Get(string(json), "action")
+				fmt.Println(*value.Repo.Name, *value.Type, action)
+			}
 		}
 	}
-
 }
