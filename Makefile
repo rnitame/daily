@@ -4,7 +4,7 @@ VERSION  := v0.1.0
 SRCS    := $(shell find . -type f -name '*.go')
 DIST_DIRS := find * -type dist -exec
 
-# todo: make bin/NAME
+# TODO: set 'make bin/NAME'
 
 test:
 	go test -cover -v `glide novendor`
@@ -16,6 +16,7 @@ cross-build:
 		done; \
 	done
 
+# TODO: `dist` is up to date
 dist:
 	cd dist && \
 	$(DIST_DIRS) zip -r $(NAME)-$(VERSION)-{}.zip {} \; && \
