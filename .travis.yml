@@ -1,0 +1,13 @@
+language: go
+
+before_install:
+  - mkdir -p $GOPATH/bin
+  - curl https://glide.sh/get | sh
+
+script:
+  - glide install
+  - go test -v
+
+after_success:
+  - test -n "$TRAVIS_TAG" && curl -sL https://git.io/goreleaser | bash
+  - goreleaser

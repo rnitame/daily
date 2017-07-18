@@ -1,0 +1,32 @@
+# Build customization
+builds:
+  - binary: daily
+    goos:
+      - windows
+      - darwin
+      - linux
+    goarch:
+      - amd64
+
+# Archive customization
+archive:
+  format: zip
+  format_overrides:
+    - goos: windows
+      format: zip
+
+# Release customization
+release:
+  github:
+    owner: rnitame
+    name: daily
+
+brew:
+  github:
+    owner: rnitame
+    name: homebrew-daily
+
+  homepage: "https://github.com/rnitame/daily"
+
+  install: |
+    bin.install "daily"
