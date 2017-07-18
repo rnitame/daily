@@ -1,9 +1,11 @@
 language: go
 
+before_install:
+  - make glide 
+
 script:
- - curl https://glide.sh/get | sh
- - glide install
- - go test -v
+  - glide install
+  - go test -v
 
 after_success:
   - test -n "$TRAVIS_TAG" && curl -sL https://git.io/goreleaser | bash
