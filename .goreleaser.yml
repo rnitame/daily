@@ -20,3 +20,13 @@ release:
   github:
     owner: rnitame
     name: daily
+
+brew:
+  github:
+    owner: rnitame
+    name: homebrew-daily
+
+  homepage: "https://github.com/rnitame/daily"
+
+  install: |
+    bin.install "daily"
