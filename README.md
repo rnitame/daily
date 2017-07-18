@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/rnitame/daily.svg?branch=master)](https://travis-ci.org/rnitame/daily)
+
 # daily
 Get daily events from GitHub
 
