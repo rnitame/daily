@@ -1,8 +1,8 @@
 language: go
 
 before_install:
-  - mkdir -p $GOPATH/bin
-  - curl https://glide.sh/get | sh
+  # https://github.com/percona/qan-agent/pull/46
+  - go get -u github.com/Masterminds/glide
 
 script:
   - glide install
