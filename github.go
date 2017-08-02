@@ -20,6 +20,10 @@ func NewGitHubClient() *github.Client {
 	if err != nil {
 		log.Fatalln(errors.Wrap(err, "get github token failed"))
 	}
+	token, err = gitconfig.Global("ghe.token")
+	if err != nil {
+		log.Fatalln(errors.Wrap(err, "get ghe token failed"))
+	}
 
 	ts := oauth2.StaticTokenSource(
 		&oauth2.Token{AccessToken: token},
@@ -29,7 +33,7 @@ func NewGitHubClient() *github.Client {
 	return github.NewClient(tc)
 }
 
-// GetEvents GitHub API から自分のイベントを取得
+// GetEvents GitHub/GHE API から自分のイベントを取得
 func GetEvents(client *github.Client, org *string) {
 	options := github.ListOptions{Page: 1, PerPage: 50}
 	user, _, err := client.Users.Get(oauth2.NoContext, "")
