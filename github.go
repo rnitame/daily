@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"net/url"
 	"strings"
 	"time"
 
@@ -18,11 +19,22 @@ import (
 func NewGitHubClient() *github.Client {
 	token, err := gitconfig.Global("github.token")
 	if err != nil {
-		log.Fatalln(errors.Wrap(err, "get github token failed"))
+		log.Fatalln(errors.Wrap(err, "get token failed"))
 	}
-	token, err = gitconfig.Global("ghe.token")
+
+	ts := oauth2.StaticTokenSource(
+		&oauth2.Token{AccessToken: token},
+	)
+	tc := oauth2.NewClient(oauth2.NoContext, ts)
+
+	return github.NewClient(tc)
+}
+
+// NewGHEClient go-github のクライアント作成
+func NewGHEClient() *github.Client {
+	token, err := gitconfig.Global("ghe.token")
 	if err != nil {
-		log.Fatalln(errors.Wrap(err, "get ghe token failed"))
+		log.Fatalln(errors.Wrap(err, "get token failed"))
 	}
 
 	ts := oauth2.StaticTokenSource(
@@ -34,8 +46,12 @@ func NewGitHubClient() *github.Client {
 }
 
 // GetEvents GitHub/GHE API から自分のイベントを取得
-func GetEvents(client *github.Client, org *string) {
+func GetEvents(client *github.Client, org *string, ghe *string) {
 	options := github.ListOptions{Page: 1, PerPage: 50}
+	if *ghe != "" {
+		baseurl, _ := url.Parse(*ghe)
+		client.BaseURL = baseurl
+	}
 	user, _, err := client.Users.Get(oauth2.NoContext, "")
 	if err != nil {
 		log.Fatalln(errors.Wrap(err, "get users failed"))
